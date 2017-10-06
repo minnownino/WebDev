@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TP53</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="gene_css.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <style>
+  body {
+      position: relative; 
+  }
+  .affix {
+      top:0;
+      width: 100%;
+      height: 0px;
+      z-index: 9999 !important;
+  }
+  .navbar {
+      margin-bottom: 0px;
+  }
+
+  .affix ~ .container-fluid {
+     position: relative;
+     
+  }
+  .zoom {
+    cursor: move;
+    fill: none;
+    pointer-events: all;
+  }
+  rect.pane {
+    cursor: move;
+    fill: none;
+    pointer-events: all;
+  }
+  .brush .extent {
+    stroke: #fff;
+    fill-opacity: .125;
+    shape-rendering: crispEdges;
+    clip-path: url(#clip);
+  }
+  .axis path {
+    fill: none;
+  }
+
+  #section1 {padding-top:50px;height:130px;color: #000; background-color: #fff;}
+  #section2 {padding-top:50px;height:550px;color: #000; background-color: #fff;}
+  #section3 {padding-top:50px;height:669px;color: #000; background-color: #fff;}
+  #section41 {padding-top:50px;height:500px;color: #fff; background-color: #00bcd4;}
+  #section4 {padding-top:50px;height:500px;color: #000; background-color: #fff;}
+  </style>
+</head>
+<body data-spy="scroll" data-target=".navbar" data-offset="50">
+
+<div class="container-fluid" style="background-color:#f5f5f5;color:black;height:auto;">
+  <h1>TP53 </h1>
+  <p><a href="https://en.wikipedia.org/wiki/TP53" />TP53 Wikipedia</p>
+  <p><a href="http://www.genecards.org/cgi-bin/carddisp.pl?gene=TP53"/>TP53 Genecard</p>
+  <p><a href="https://www.ncbi.nlm.nih.gov/gene/7157"/>TP53 NCBI</p>
+</div>
+
+<nav class="navbar navbar-inverse" data-spy="affix" data-offset-top="50">
+  <div class="container-fluid">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#">TP53</a>
+    </div>
+    <div>
+      <div class="collapse navbar-collapse" id="myNavbar">
+        <ul class="nav navbar-nav">
+          <li><a href="#section1">CT distribution</a></li>
+          <li><a href="#section2">DEG</a></li>
+          <li><a href="#section3">Scatter</a></li>
+          <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Section 4 <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="#section4">Section 4</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>    
+<div class="container">
+  <div id="section1" class="container-fluid">
+    <div id ="legend"></div>
+    <div id="barForGene"></div>
+  </div>
+  <div id="section2" class="container-fluid">
+  </div>
+  <div id="section3" class="container-fluid">
+  </div>
+  <div id ="section4" class="container-fluid">
+  </div>
+</div>
+<footer class="footer">
+  <div class="container" align="center">
+    <p>Xinghua's lab presents, 2017</p>
+  </div>
+</footer>
+	<script src="static/d3.min.js"></script>
+	<script src="script_gene.js"></script>
+  <script src="scroll.js"></script>
+</body>
+</html>

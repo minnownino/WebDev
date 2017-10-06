@@ -1,0 +1,65 @@
+.page-header{
+	position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #cc5350;
+    color:#fff;
+    z-index: 1000;
+    height: 100px;
+    overflow: hidden;
+    -webkit-transition: height 0.3s;
+    -moz-transition: height 0.3s;
+    transition: height 0.3s;
+    text-align:center;
+    line-height:160px;
+
+}
+.page-header.shrink {
+    height: 50px;
+    line-height:80px;
+}
+
+.page-header.shrink h1
+{
+    font-size:10px;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+.change0 {
+    fill-opacity: 0;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #f5f5f5;
+}
+.container {
+    margin-left: 0;
+    padding-left:0;
+}
+
+.SoM {
+  fill: #ff9933;  
+}
+.AMP {
+  fill: #ff4f49;
+}
+.DEL {
+  fill: #00768f;
+}
+#stackTwoLeft {
+  background-color: grey;
+  float: left;
+}
+
+#stackTwoRight {
+  background-color: orange;
+  float: left;
+}
