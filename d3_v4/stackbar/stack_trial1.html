@@ -37,7 +37,7 @@ var colors = ['#FBB65B', '#513551', '#de3163'];
 var data = [{"mut": 95, "cancertype": "BLCA", "del": 5, "amp": 0}, {"mut": 245, "cancertype": "BRCA", "del": 6, "amp": 0}, {"mut": 104, "cancertype": "COAD", "del": 2, "amp": 0}, {"mut": 129, "cancertype": "ESCA", "del": 2, "amp": 0}, {"mut": 66, "cancertype": "GBM", "del": 5, "amp": 0}, {"mut": 316, "cancertype": "HNSC", "del": 3, "amp": 1}, {"mut": 17, "cancertype": "KIRC", "del": 0, "amp": 0}, {"mut": 4, "cancertype": "KIRP", "del": 0, "amp": 0}, {"mut": 41, "cancertype": "LIHC", "del": 2, "amp": 0}, {"mut": 186, "cancertype": "LUAD", "del": 3, "amp": 0}, {"mut": 108, "cancertype": "LUSC", "del": 3, "amp": 0}, {"mut": 269, "cancertype": "OV", "del": 2, "amp": 4}, {"mut": 44, "cancertype": "PRAD", "del": 33, "amp": 0}, {"mut": 57, "cancertype": "READ", "del": 0, "amp": 0}, {"mut": 80, "cancertype": "STAD", "del": 3, "amp": 0}, {"mut": 41, "cancertype": "UCEC", "del": 0, "amp": 0}, {"mut": 1802, "cancertype": "all", "del": 3, "amp": 4}];
 
 //var sub_width = (width - margin_left - margin_right) / 17; // 16 + 1 with all pancancer type
-var sub_width = 80;
+var sub_width = 50;
 var max = getMax(data);
 
 console.log(max);
@@ -47,7 +47,7 @@ var barScale = d3.scaleLinear()
 				.domain([0, max])
 				.range([0, sub_width]);
 
-var total_max = data[15]['mut'] + data[15]['del'] + data[15]['amp'];
+var total_max = data[16]['mut'] + data[15]['del'] + data[15]['amp'];
 var totalScale = d3.scaleLinear()
 					.domain([0, total_max])
 					.range([0, sub_width]);
@@ -81,11 +81,18 @@ g.selectAll('rect')
 	.enter()
 	.append('rect')
 	.attr('width', function(d) {
-		return barScale(d[1] - d[0]);
+		if (d['data']['cancertype'] == 'all') {
+			return totalScale(d[1] - d[0]);
+		} else {
+			return barScale(d[1] - d[0]);
+		}
 	})
 	.attr('x', function(d, i) {
-
-		return barScale(d[0]) + sub_width * i; //+ stack_width * i;
+		if (d['data']['cancertype'] == 'all') {
+			return totalScale(d[0]) + sub_width * i;
+		} else {
+			return barScale(d[0]) + sub_width * i; //+ stack_width * i;
+		}
 	})
 	.attr('class', function(d, i) {
 		return d3.select(this).attr('class') + " " + d['data']['cancertype'];
