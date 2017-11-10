@@ -35,7 +35,7 @@
 <body>
   <p><input type="text" id="fname" value="TP53">TP53</p>
   <div id = "scatter_left">
-  <svg width="100%" height="500" id='paint'>
+  <svg width="100%" height="700" id='paint'>
   	<g></g>
   </svg>
 </div>
@@ -74,7 +74,7 @@ function createScatter(data) {
   var tooltip = d3.select('body').append("div")
       .attr("class", "tooltip")
       .style("opacity", 0);
-  var zoomarea = svg.call(d3.zoom().on("zoom", zoom).scaleExtent([1, 15]));
+  var zoomarea = svg.call(d3.zoom().on("zoom", zoom).scaleExtent([1, 15]).extent([[0,0],[1011, 500]]).translateExtent([[0,0],[1011, 500]]));
   colors = {'Missense_Mutation': '#819090', 'Nonsense_Mutation': 'red', 'Frame_Shift_Ins': 'black','In_Frame_Del': 'blue', 'Frame_Shift_Del':'purple', 'Splice_Site':'green', 'In_Frame_Ins': 'yellow','Translation_Start_Site': 'orange'};
   var maxWidth = getmaxWidth(data);
   console.log(maxWidth);
@@ -85,9 +85,10 @@ function createScatter(data) {
   y.range([0, 500])
 
 var xAxis = d3.axisBottom(x);
+
 var x_axis = svg.append("g")
                .attr("id", "x_axis")
-               //.attr("transform", "translate(75,0)")
+               .attr("transform", "translate(0,500)")
                .call(xAxis)
 
 // Add the tooltip container to the vis container
