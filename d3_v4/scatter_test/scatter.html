@@ -169,7 +169,6 @@ function getTypes(data) {
 var svg = d3.select('#scatter_left');
 legend_data = getTypes(data)
 legend_data.pop();
-legend_data.push('all')
 scatter_legend.selectAll('button').data(legend_data)
     .enter().append('text')
     .attr('class', 'button')
@@ -197,14 +196,14 @@ scatter_legend.selectAll('button').data(legend_data)
     .on('click',  function(d) {
       //console.log(svg.selectAll('.' + d));
       //var visible = true;
-      if (svg.selectAll('.' + d).classed('change0') == true) {
-        svg.selectAll('.' + d).classed('change0', false);
-        svg.selectAll('.' + d).attr('r', 3);
-      } else {
-        //console.log('false');
-        svg.selectAll('.' + d).classed('change0', true);
-        svg.selectAll('.' + d).attr('r', 1);
-      }
+      // if (svg.selectAll('.' + d).classed('change0') == true) {
+      //   svg.selectAll('.' + d).classed('change0', false);
+      //   svg.selectAll('.' + d).attr('r', 3);
+      // } else {
+      //   //console.log('false');
+      //   svg.selectAll('.' + d).classed('change0', true);
+      //   svg.selectAll('.' + d).attr('r', 1);
+      // }
 
     });
 
@@ -240,12 +239,15 @@ scatter_legend.selectAll('foreignObject').data(legend_data)
       })
       //.on('change', update)
       .on("click", function(d, i){
-        console.log(d3.select(this).select('input').attr("checked") == true);
-          if (d3.select(this).select('input')) {
-            console.log("good");
+        console.log(this.id);
+          if (svg.selectAll('.' + d).classed('change0') == true) {
+            svg.selectAll('.' + d).classed('change0', false);
+            svg.selectAll('.' + d).attr('r', 3);
           } else {
-            console.log('bad');
-          };
+            //console.log('false');
+            svg.selectAll('.' + d).classed('change0', true);
+            svg.selectAll('.' + d).attr('r', 1);
+          }
       })
 
 function update(){
