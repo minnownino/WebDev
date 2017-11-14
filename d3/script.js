@@ -32,11 +32,31 @@ var colors = d3.scale.linear()
 				.domain([0, d3.max(bardata)])
 				.range(['#819090', '#000000']);
 
+
 var chart = d3.select('#chart').append('svg')
 			    .attr('width', width)
 			    .attr('height', height)
 			    .style('position', 'absolute');
 
+
+//create the rows
+chart.selectAll('.rect').data(rows)
+						.enter().append('rect')
+						.attr('width', '100%')
+						.attr('height', 15)
+						.attr('x', 0)
+						.attr('y', function(d, i) {
+							console.log(17 * (i + 1));
+							return 17 * (i + 1);
+						})
+						.style('fill', function(d, i) {
+							if (i % 2 == 0) {
+								return "#3E9583";
+							} else {
+								return "#ffffff";
+							}
+						})
+						.style('opacity', 0.1);
 
 var firstline = chart.selectAll('text').data(cancer_types)
 					.enter().append('text')
@@ -81,24 +101,7 @@ legend.selectAll('text').data(legends)
 	})
 	.style('fill', 'black');
 
-//create the rows
-chart.selectAll('.rect').data(rows)
-						.enter().append('rect')
-						.attr('width', 1200)
-						.attr('height', 15)
-						.attr('x', 0)
-						.attr('y', function(d, i) {
-							console.log('get here!!!!!')
-							return 17 * (i + 1);
-						})
-						.style('fill', function(d, i) {
-							if (i % 2 == 0) {
-								return "#3E9583";
-							} else {
-								return "#ffffff";
-							}
-						})
-						.style('opacity', 0.1);
+
 
 
 
