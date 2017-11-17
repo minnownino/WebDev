@@ -1,93 +1,357 @@
 <!DOCTYPE html>
-<html>
-<head>
-	<meta charset="UTF-8">
-	<title>D3 Graphic</title>
-	<link rel="stylesheet" href="static/base.css">
-	<link rel="stylesheet" href="style.css">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
-	<script>
-	$(function(){
-	 var shrinkHeader = 100;
-	  $(window).scroll(function() {
-	    var scroll = getCurrentScroll();
-	    console.log("scroll " + scroll + " shrinkHeader " + shrinkHeader);
-	    console.log(scroll >= shrinkHeader);
-	      if ( scroll >= shrinkHeader ) {
-	           $('.header').addClass('shrink');
-	        }
-	        else {
-	            $('.header').removeClass('shrink');
-	        }
-	  });
-	function getCurrentScroll() {
-		console.log("The value is " + window.pageYOffset || document.documentElement.scrollTop)
-	    return window.pageYOffset || document.documentElement.scrollTop;
-	    }
-	});
-	</script>
-</head>
-
+<meta charset="utf-8">
+<style type="text/css">
+    body {
+        font-size: 100%;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        width: 960px;
+    }
+    #refresh-btn {
+        float: right;
+        font-size: 12px;
+        border-radius: 0;
+    }
+</style>
 <body>
-	<!-- <div class="header">
-		<h1>Animated Fixed Header (Scroll Down)</h1>
-	</div> -->
-	<nav class="navbar navbar-inverse">
-	  <div class="container-fluid">
-	    <div class="navbar-header">
-	      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>                        
-	      </button>
-	      <a class="navbar-brand" href="#">TDI Database</a>
-	    </div>
-	    <div class="collapse navbar-collapse" id="myNavbar">
-	      <ul class="nav navbar-nav">
-	        <li class="active"><a href="#">Home</a></li>
-	        <li class="dropdown">
-	          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Page 1 <span class="caret"></span></a>
-	          <ul class="dropdown-menu">
-	            <li><a href="#">Page 1-1</a></li>
-	            <li><a href="#">Page 1-2</a></li>
-	            <li><a href="#">Page 1-3</a></li>
-	          </ul>
-	        </li>
-	        <li><a href="#">Page 2</a></li>
-	        <li><a href="#">Page 3</a></li>
-	      </ul>
-	      <form class="navbar-form" align="right" role="search">
-		    <div class="input-group add-on">
-		      <input class="form-control" placeholder="Search" name="srch-term" id="srch-term" type="text">
-		      <div class="input-group-btn">
-		        <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-		      </div>
-		    </div>
-  		   </form>
-	    </div>
-	  </div>
-	</nav>
+    <button type="button" id="refresh-btn">Refresh data</button>
+    <div id="donut-charts"></div>
 
-	<div class="container">
-		<div class="row">
-		    <div class="col-sm-12" style="height:50px;"><img src="logo.png" style="height: 50px; width:150px;" align="left"></div>
-		</div>
-		<div class="row">
-		    <div class="col-sm-10" style="height:50px;"><div class="col-sm-8" style="height:50px;"><h3 style="display: inline">Top TDI drivers in PanCancer Analysis</h3></div></div>
-		    <div class="col-sm-2" style="height:50px;"><div class="line" id="legend" align="right"></div></div>
-		</div>
-		
-		<div class="line" id="chart"></div>	
-	</div>
-	
-	<footer class="footer">
-		<div class="container" align="center">
-			<p>Xinghua's lab presents, 2017</p>
-		</div>
-	</footer>
-	<script src="static/d3.min.js"></script>
-	<script src="script.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script>
 
+    $(function() {
+
+        var donutData = genData();
+
+        var donuts = new DonutCharts();
+        donuts.create(donutData);
+
+        $('#refresh-btn').on('click', function refresh() {
+            donuts.update(genData);
+        });
+
+    });
+    
+
+    function DonutCharts() {
+
+        var charts = d3.select('#donut-charts');
+
+        var chart_m,
+            chart_r,
+            color = d3.scale.category20();
+
+        var getCatNames = function(dataset) {
+            var catNames = new Array();
+
+            for (var i = 0; i < dataset[0].data.length; i++) {
+                catNames.push(dataset[0].data[i].cat);
+            }
+
+            return catNames;
+        }
+
+        var createLegend = function(catNames) {
+            var legends = charts.select('.legend')
+                            .selectAll('g')
+                                .data(catNames)
+                            .enter().append('g')
+                                .attr('transform', function(d, i) {
+                                    return 'translate(' + (i * 60) + ', 10)';
+                                });
+    
+            legends.append('circle')
+                .attr('class', 'legend-icon')
+                .attr('r', 6)
+                .style('fill', function(d, i) {
+                    return color(i);
+                });
+    
+            legends.append('text')
+                .attr('dx', '1em')
+                .attr('dy', '.3em')
+                .text(function(d) {
+                    return d;
+                });
+        }
+
+        var createCenter = function(pie) {
+
+            var eventObj = {
+                'mouseover': function(d, i) {
+                    d3.select(this)
+                        .transition()
+                        .attr("r", chart_r * 0.65);
+                },
+
+                'mouseout': function(d, i) {
+                    d3.select(this)
+                        .transition()
+                        .duration(500)
+                        .ease('bounce')
+                        .attr("r", chart_r * 0.6);
+                },
+
+                'click': function(d, i) {
+                    var paths = charts.selectAll('.clicked');
+                    pathAnim(paths, 0);
+                    paths.classed('clicked', false);
+                    resetAllCenterText();
+                }
+            }
+
+            var donuts = d3.selectAll('.donut');
+
+
+            // The circle displaying total data.
+            donuts.append("svg:circle")
+                .attr("r", chart_r * 0.6)
+                .style("fill", "#E7E7E7")
+                .on(eventObj);
+    
+            donuts.append('text')
+                    .attr('class', 'center-txt type')
+                    .attr('y', chart_r * -0.16)
+                    .attr('text-anchor', 'middle')
+                    .style('font-weight', 'bold')
+                    .text(function(d, i) {
+                        //console.log(d.type);
+                        return d.type;
+                    });
+            donuts.append('text')
+                    .attr('class', 'center-txt value')
+                    .attr('text-anchor', 'middle');
+            donuts.append('text')
+                .attr('class', 'center-txt cancertype')
+                .attr('y', chart_r * 1.05)
+                .attr('text-anchor', 'middle');
+            donuts.append('text')
+                    .attr('class', 'center-txt percentage')
+                    .attr('y', chart_r * 0.16)
+                    .attr('text-anchor', 'middle')
+                    .style('fill', '#A2A2A2');
+        }
+
+        var setCenterText = function(thisDonut) {
+            var sum = d3.sum(thisDonut.selectAll('.clicked').data(), function(d) {
+                return d.data.val;
+            });
+
+            thisDonut.select('.value')
+                .text(function(d) {
+                    return (sum)? sum.toFixed(1) + d.unit
+                                : d.total.toFixed(1) + d.unit;
+                });
+            thisDonut.select('.percentage')
+                .text(function(d) {
+                    return (sum)? (sum/d.total*100).toFixed(2) + '%'
+                                : '';
+                });
+        }
+
+        var resetAllCenterText = function() {
+            charts.selectAll('.value')
+                .text(function(d) {
+                    return d.total.toFixed(1) + d.unit;
+                });
+            charts.selectAll('.percentage')
+                .text('');
+        }
+
+        var pathAnim = function(path, dir) {
+            switch(dir) {
+                case 0:
+                    path.transition()
+                        .duration(500)
+                        .ease('bounce')
+                        .attr('d', d3.svg.arc()
+                            .innerRadius(chart_r * 0.7)
+                            .outerRadius(chart_r)
+                        );
+                    break;
+
+                case 1:
+                    path.transition()
+                        .attr('d', d3.svg.arc()
+                            .innerRadius(chart_r * 0.7)
+                            .outerRadius(chart_r * 1.08)
+                        );
+                    break;
+            }
+        }
+
+        var updateDonut = function() {
+
+            var eventObj = {
+
+                'mouseover': function(d, i, j) {
+                    pathAnim(d3.select(this), 1);
+
+                    var thisDonut = charts.select('.type' + j);
+
+                    thisDonut.select('.value').text(function(donut_d) {
+                        console.log(d.data.cat);
+                        return d.data.val.toFixed(1) + donut_d.unit;
+                    });
+                    // console.log(d3.select(this));
+                    // thisDonut.select('.cancertype')
+                    //     .attr('x', )
+                    //     .attr('y', d3.select(this).attr('cy') * 1.1)
+                    //     .text(function(donut_d) {
+                    //         return d.data.cat;
+                    //     });
+                    thisDonut.select('.percentage').text(function(donut_d) {
+                        return (d.data.val/donut_d.total*100).toFixed(2) + '%';
+                    });
+                },
+                
+                'mouseout': function(d, i, j) {
+                    var thisPath = d3.select(this);
+                    if (!thisPath.classed('clicked')) {
+                        pathAnim(thisPath, 0);
+                    }
+                    var thisDonut = charts.select('.type' + j);
+                    setCenterText(thisDonut);
+                },
+
+                'click': function(d, i, j) {
+                    var thisDonut = charts.select('.type' + j);
+
+                    if (0 === thisDonut.selectAll('.clicked')[0].length) {
+                        thisDonut.select('circle').on('click')();
+                    }
+
+                    var thisPath = d3.select(this);
+                    var clicked = thisPath.classed('clicked');
+                    pathAnim(thisPath, ~~(!clicked));
+                    thisPath.classed('clicked', !clicked);
+
+                    setCenterText(thisDonut);
+                }
+            };
+
+            var pie = d3.layout.pie()
+                            .sort(d3.ascending)
+                            .value(function(d) {
+                                return d.val;
+                            });
+
+            var arc = d3.svg.arc()
+                            .innerRadius(chart_r * 0.7)
+                            .outerRadius(function() {
+                                return (d3.select(this).classed('clicked'))? chart_r * 1.08
+                                                                           : chart_r;
+                            });
+            var labelarc = d3.svg.arc()
+                            .innerRadius(chart_r )
+                            .outerRadius(chart_r * 1.3)
+            // Start joining data with paths
+            var paths = charts.selectAll('.donut')
+                            .selectAll('path')
+                            .data(function(d, i) {
+                                return pie(d.data);
+                            });
+
+            paths
+                .transition()
+                .duration(1000)
+                .attr('d', arc);
+
+            paths.enter()
+                .append('svg:path')
+                    .attr('d', arc)
+                    .style('fill', function(d, i) {
+                        return color(i);
+                    })
+                    .style('stroke', '#FFFFFF')
+                    .on(eventObj)
+
+            paths.exit().remove();
+
+            paths.enter()
+                .append('text')
+                .attr("transform", function(d) { return "translate(" + labelarc.centroid(d) + ")"; })
+                .attr("dy", ".35em")
+                .text(function(d) { return d.data.cat; });
+
+            resetAllCenterText();
+
+
+        }
+
+        this.create = function(dataset) {
+            var $charts = $('#donut-charts');
+            chart_m = $charts.innerWidth() / dataset.length / 2 * 0.14;
+            chart_r = $charts.innerWidth() / dataset.length / 2 * 0.85;
+
+            charts.append('svg')
+                .attr('class', 'legend')
+                .attr('width', '100%')
+                .attr('height', 50)
+                .attr('transform', 'translate(0, 0)');
+
+            var donut = charts.selectAll('.donut')
+                            .data(dataset)
+                        .enter().append('svg:svg')
+                            .attr('width', (chart_r + chart_m) * 2)
+                            .attr('height', (chart_r + chart_m) * 2)
+                        .append('svg:g')
+                            .attr('class', function(d, i) {
+                                return 'donut type' + i;
+                            })
+                            .attr('transform', 'translate(' + (chart_r+chart_m) + ',' + (chart_r+chart_m) + ')');
+
+            createLegend(getCatNames(dataset));
+            createCenter();
+
+            updateDonut();
+        }
+    
+        this.update = function(dataset) {
+            // Assume no new categ of data enter
+            var donut = charts.selectAll(".donut")
+                        .data(dataset);
+
+            updateDonut();
+        }
+    }
+
+
+    /*
+     * Returns a json-like object.
+     */
+    function genData() {
+        //data = '{"count":{"blca":414,"brca":851,"esca":262,"gbm":129,"hnsc":555,"kirc":66,"kirp":14,"lihc":178,"luad":532,"lusc":242,"ov":677,"prad":178,"stad":333,"ucec":112}}';
+        input = JSON.parse('{"count":{"acc":16,"blca":199,"brca":306,"cesc":9,"chol":5,"coad":4,"coadread":248,"dlbc":6,"esca":160,"gbm":84,"hnsc":352,"kich":22,"kirc":17,"kirp":4,"laml":15,"lgg":247,"lihc":62,"luad":285,"lusc":136,"ov":397,"paad":100,"pcpg":1,"prad":61,"read":1,"sarc":90,"skcm":55,"stad":189,"tgct":2,"thca":2,"thym":4,"ucec":65,"ucs":51}}');
+        var type = ['SGAs'];
+        var unit = [' tumors', '', ''];
+        //var cat = ['Google Drive', 'Dropbox', 'iCloud', 'OneDrive', 'Box'];
+        cat = Object.keys(input['count']);
+        var dataset = new Array();
+
+        for (var i = 0; i < type.length; i++) {
+            var data = new Array();
+            var total = 0;
+
+            for (var j = 0; j < cat.length; j++) {
+                //var value = Math.random()*10*(3-i);
+                var value = input["count"][cat[j]];
+                total += value;
+                data.push({
+                    "cat": cat[j],
+                    "val": value
+                });
+            }
+
+            dataset.push({
+                "type": type[i],
+                "unit": unit[i],
+                "data": data,
+                "total": total
+            });
+        }
+        return dataset;
+    }
+    </script>
 </body>
-</html>
